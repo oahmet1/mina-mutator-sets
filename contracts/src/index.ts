@@ -1,3 +1,3 @@
-import { Add } from './Add.js';
+import { Leaderboard } from './Leaderbord.js';
 
-export { Add };
+export { Leaderboard };
