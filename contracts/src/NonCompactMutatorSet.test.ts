@@ -6,7 +6,7 @@ import {
     Poseidon,
     Provable,
   } from 'o1js';
-  import { AOCL, AOCLWitness } from './AOCL'; 
+  import { AOCL, AOCLWitness } from './NonCompactMutatorSet'; 
   
   
   describe('AOCL Tests', () => {
