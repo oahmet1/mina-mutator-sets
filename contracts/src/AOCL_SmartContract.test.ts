@@ -1,5 +1,5 @@
 import { AOCL_Update } from './AOCL_SmartContract';
-import { AOCL, AOCLWitness } from './AOCL';
+import { AOCL, AOCLReturn } from './AOCL';
 import { Field, Mina, PrivateKey, PublicKey, AccountUpdate,SmartContract,
     Poseidon, State,state,method,UInt32, UInt64 } from 'o1js';
 
@@ -12,7 +12,6 @@ describe('AOCL Test ', () => {
     contractAccount: Mina.TestPublicKey,
     feePayer : Mina.TestPublicKey;
     
-
   beforeAll(async () => {
     
     let Local = await Mina.LocalBlockchain({ proofsEnabled: proofsEnabled });
@@ -47,7 +46,7 @@ describe('AOCL Test ', () => {
   });
 
   it('add an element to the AOCL', async () => {
-    let aocl = new AOCL({numElements : UInt64.from(0), commitmentList :[]});
+    let aocl = new AOCL();
     const random_num = Field.random();
 
     let tx = await Mina.transaction(feePayer, async () => {
@@ -56,5 +55,9 @@ describe('AOCL Test ', () => {
 
     await tx.prove();
     await tx.sign([feePayer.key, contractAccount.key]).send();
+
+    aocl.add(Field(22), random_num);
+    await contract.commitment.get().assertEquals(aocl.commitmentList.get(Field.from(0)));
   });
+
 });

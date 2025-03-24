@@ -1,79 +1,54 @@
 import {
     Field,
-    SmartContract,
-    UInt64,
     Struct,
     Poseidon,
-    state,
-    State,
-    method,
-    Circuit,
     Bool,
-    Provable,
   } from 'o1js';
-import { prop } from 'o1js/dist/node/lib/provable/types/circuit-value';
 
-import { CircuitValue, arrayProp } from 'o1js/src/lib/provable/types/circuit-value';
-export {AOCL};
+import { Experimental } from 'o1js';
+const { IndexedMerkleMap } = Experimental;
 
-
-const MAX_ELEMENTS = UInt64.from(100);
-
-export class AOCLWitness extends Struct({
-    elementIndex: UInt64,
-    message: Field,
-    randomNumber: Field,
-}) {}
+class MerkleMap extends IndexedMerkleMap(8) {}
 
 export class AOCLReturn extends Struct({
-    elementIndex: UInt64,
-    message: Field,
+    elementIndex: Field,
+    commitment: Field,
     randomNumber: Field,
 }) {}
 
-export class BaseAOCL extends Struct({
-    numElements: UInt64,
-    commitmentList: Provable.Array(Field, Number(MAX_ELEMENTS)),
-    size(): number {
-      return (this.constructor as any).size;
-    }
+export class AOCL extends Struct({
+    numElements: Field,
+    size: Field,
+    commitmentList: MerkleMap,
   }) {
     constructor() {
       super({
-        size: 0,
-        numElements: UInt64.zero,
-        commitmentList: Array(Number(MAX_ELEMENTS)).fill(Field(0))
+        size: Field.from(8),
+        numElements: Field.from(1),
+        commitmentList: new MerkleMap()
       });
     }
 
-    add(message: Field): AOCLWitness {
-        const random_num = Field.random();
-        const commitment = Poseidon.hash([message, random_num]);
-
+    add(message: Field, randomNumber : Field): AOCLReturn {
+        const commitment = Poseidon.hash([message, randomNumber]);
         const index = this.numElements;
-        
-        this.commitmentList[Number(index)] = commitment;
-        this.numElements = this.numElements.add(UInt64.one);
 
-        return new AOCLWitness({ elementIndex: index, message, randomNumber: random_num });
+        let smokeMerkleMap = new MerkleMap();
+        smokeMerkleMap.insert(index, commitment);
+        
+        let commList : MerkleMap = this.commitmentList
+        commList.insert(index, commitment); // This line fails
+        this.numElements = this.numElements.add(1);
+
+        return new AOCLReturn({ elementIndex: index, commitment, randomNumber: randomNumber });
     }
 
-    verify(witness: AOCLWitness): Bool {
-        const index = Number(witness.elementIndex);
+    verify(message: Field, index : Field, randomNumber : Field): Bool {
 
-        const commitment = this.commitmentList[index];
-        const expectedCommitment = Poseidon.hash([witness.message, witness.randomNumber]);
+        const commitment = Poseidon.hash([message, randomNumber]);
+        const expectedCommitment = this.commitmentList.getOption(index).orElse(Field(0));
         
         return commitment.equals(expectedCommitment);
     }
 
-}
-
-function AOCL(size: number): typeof BaseAOCL {
-  class AOCL_ extends BaseAOCL {
-    @prop static size : number = size;
-  }
-  arrayProp(Field, size - 1)(AOCL_.prototype, 'commitmentList');
-  //arrayProp(Bool, height - 1)(AOCL_.prototype, 'isLeft');
-  return AOCL_;
 }
