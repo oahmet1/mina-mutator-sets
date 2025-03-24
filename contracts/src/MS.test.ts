@@ -6,7 +6,7 @@ import {
     Poseidon,
     Provable,
   } from 'o1js';
-  import { AOCL, AOCLWitness } from './NonCompactMutatorSet'; 
+  import { AOCL, AOCLWitness } from './AOCL'; 
   
   
   describe('AOCL Tests', () => {
@@ -32,7 +32,6 @@ import {
       expect(isValid.toBoolean()).toBe(true);
     });
     
-  
     it('fail verification for incorrect proof', () => {
       const aocl = new AOCL();
       const witness = aocl.add(Field(10));

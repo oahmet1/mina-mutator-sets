@@ -1,3 +1,3 @@
-import { Leaderboard } from './Leaderbord.js';
+import { Leaderboard } from './MS_SmartContract.js';
 
 export { Leaderboard };

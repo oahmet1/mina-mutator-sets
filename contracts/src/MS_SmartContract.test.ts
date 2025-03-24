@@ -1,4 +1,4 @@
-import { Leaderboard, Account } from './Leaderbord';
+import { Leaderboard, Account } from './MS_SmartContract';
 import { Field, Mina, PrivateKey, PublicKey, AccountUpdate,SmartContract,
     Poseidon, State,state,method,UInt32,MerkleTree,MerkleWitness } from 'o1js';
 
@@ -52,6 +52,10 @@ describe('Mutator Sets ', () => {
 
     // now that we got our accounts set up, we need the commitment to deploy our contract!
     contract = new Leaderboard(contractAccount);
+    // print the return of analyze methods
+    const res_analyzemethods = await Leaderboard.analyzeMethods()
+    console.log('The result of the analyze methods is: ', res_analyzemethods );
+    
     console.log('Deploying leaderboard..');
     if (proofsEnabled) {
       await Leaderboard.compile();
