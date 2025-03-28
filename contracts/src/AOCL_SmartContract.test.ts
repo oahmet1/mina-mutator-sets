@@ -57,7 +57,24 @@ describe('AOCL Test ', () => {
     await tx.sign([feePayer.key, contractAccount.key]).send();
 
     aocl.add(Field(22), random_num);
-    await contract.commitment.get().assertEquals(aocl.commitmentList.get(Field.from(0)));
+    await contract.commitment.get().assertEquals(aocl.elementAtIndex(aocl.commitmentList, Field.from(0)));
   });
+
+  it('check the verify method', async () => {
+    let aocl = new AOCL();
+    const random_num = Field.random();
+
+    let tx = await Mina.transaction(feePayer, async () => {
+        let res = await contract.add_element(aocl, Field(22), random_num);
+        let res2 = await contract.verify_element(aocl, Field(22), Field(0), random_num);
+      });
+
+    await tx.prove();
+    await tx.sign([feePayer.key, contractAccount.key]).send();
+
+  });
+
+
+
 
 });

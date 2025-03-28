@@ -26,5 +26,10 @@ export class AOCL_Update extends SmartContract {
       let aoclReturn : AOCLReturn = aocl.add(message, random);
       this.commitment.set(aoclReturn.commitment);
     }
+    @method async verify_element(aocl : AOCL, message: Field, index : Field, random: Field) {
+      let aoclReturn : AOCLReturn = aocl.add(message, random);
+      let res = aocl.verify(message, index, random);
+      return res.assertEquals(true);
+    }
 
   }
