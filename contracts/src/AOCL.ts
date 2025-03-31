@@ -3,16 +3,11 @@ import {
     Struct,
     Poseidon,
     Bool,
-    MerkleTree,
-    MerkleWitness,
     Provable,
-    Circuit
   } from 'o1js';
+import { elementAtIndex } from './utils';
 
-import { Experimental } from 'o1js';
-const { IndexedMerkleMap } = Experimental;
-
-class MerkleMap extends IndexedMerkleMap(8) {}
+const MAX_ELEMENTS = 16; //1024;
 
 export class AOCLReturn extends Struct({
     elementIndex: Field,
@@ -23,15 +18,13 @@ export class AOCLReturn extends Struct({
 export class AOCL extends Struct({
     numElements: Field,
     size: Field,
-    commitmentList: Provable.Array(Field, 10)
+    commitmentList: Provable.Array(Field, MAX_ELEMENTS)
   }) {
     constructor() {
       super({
-        size: Field.from(8),
-        numElements: Field.from(0),
-        commitmentList: Provable.witness(Provable.Array(Field, 10), () => {
-          return Array(10).fill(Field(0));
-        })
+        size: Field(MAX_ELEMENTS),
+        numElements: Field(0),
+        commitmentList: Array(MAX_ELEMENTS).fill(Field(0))
       });
     }
 
@@ -39,9 +32,11 @@ export class AOCL extends Struct({
         const commitment = Poseidon.hash([message, randomNumber]);
         const index = this.numElements;
 
+        // Assign the new commitment to the appropriate index
         this.commitmentList = this.commitmentList.map((value, i) =>
           Provable.if(index.equals(Field(i)), commitment, value)
        );
+
         this.numElements = this.numElements.add(1);
 
         return new AOCLReturn({ elementIndex: index, commitment: commitment, randomNumber: randomNumber });
@@ -50,31 +45,13 @@ export class AOCL extends Struct({
     verify(message: Field, index : Field, randomNumber : Field): Bool {
 
         const commitment = Poseidon.hash([message, randomNumber]);
-        const expectedCommitment = this.elementAtIndex(this.commitmentList, index);
-        Provable.asProver(() => { 
+        const expectedCommitment = elementAtIndex(this.commitmentList, index);
+        /*Provable.asProver(() => { 
           console.log("Commitment:", commitment.toString());
           console.log("Expected Commitment:", expectedCommitment.toString()); })
-
+*/
         return commitment.equals(expectedCommitment);
     }
 
-    elementAtIndex(FieldArray: Field[], index: Field): Field {
-      const length = FieldArray.length;
-      let totalIndex = Field(0);
-      let totalValues = Field(0);
-
-      for (let i = 0; i < length; i++) {
-        const isIndex = index.equals(i).toField(); // `1` if index matches, otherwise `0`
-        const isValue = isIndex.mul(FieldArray[i]); // Multiply to retain only the matching element
-
-        totalValues = totalValues.add(isValue); // Accumulate the value
-        totalIndex = totalIndex.add(isIndex);   // Track if exactly one index matched
-      }
-
-      // Ensure that exactly one index matched
-      const errorMessage = 'Invalid index: Index out of bounds or multiple indices match!';
-      totalIndex.assertEquals(1, errorMessage);
-
-      return totalValues;
-    }
+    
 }

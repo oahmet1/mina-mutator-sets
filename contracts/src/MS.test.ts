@@ -1,5 +1,3 @@
-// mmr.test.ts
-
 import {
     Field,
     UInt64,
