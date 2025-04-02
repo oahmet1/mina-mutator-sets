@@ -7,7 +7,7 @@ import {
   } from 'o1js';
 import { elementAtIndex } from './utils';
 
-const MAX_ELEMENTS = 16; //1024;
+const MAX_ELEMENTS = 256; // Decrease the size if you want to accelerate the operations, or increase it if you want to store more elements
 
 export class AOCLReturn extends Struct({
     elementIndex: Field,
@@ -19,7 +19,7 @@ export class AOCL extends Struct({
     numElements: Field,
     size: Field,
     commitmentList: Provable.Array(Field, MAX_ELEMENTS)
-  }) {
+    }) {
     constructor() {
       super({
         size: Field(MAX_ELEMENTS),

@@ -4,6 +4,7 @@ import { Field, Mina, PrivateKey, PublicKey, AccountUpdate,SmartContract,
     Poseidon, State,state,method,UInt32, UInt64 } from 'o1js';
 import { elementAtIndex } from './utils';
 import { SWBF, SWBFReturn } from './SWBF';
+import { MS } from './MS';
 
 
 let proofsEnabled = true;
@@ -47,7 +48,7 @@ describe('Data Structures Test ', () => {
     await tx.prove();
     await tx.sign([feePayer.key, contractAccount.key]).send();
   });
-/*
+
   it('add an element to the AOCL', async () => {
     let aocl = new AOCL();
     const random_num = Field.random();
@@ -75,7 +76,7 @@ describe('Data Structures Test ', () => {
     await tx.prove();
     await tx.sign([feePayer.key, contractAccount.key]).send();
   });
-*/
+
   it('add an element to the SWBF', async () => {
     let swbf = new SWBF();
     const random_num = Field.random();
@@ -120,7 +121,50 @@ describe('Data Structures Test ', () => {
     await tx.sign([feePayer.key, contractAccount.key]).send();
   });
 
+it('add an element to the MS', async () => {
+  let ms = new MS();
+  const random_num = Field.random();
+  const message = Field(22);
 
+  let tx = await Mina.transaction(feePayer, async () => {
+      let res = await contract.add_element_ms(ms, message, random_num);
+    });
+
+  await tx.prove();
+  await tx.sign([feePayer.key, contractAccount.key]).send();
+
+});
+
+it('delete an element to the MS', async () => {
+  let ms = new MS();
+  const random_num = Field.random();
+  const message = Field(22);
+
+  let tx = await Mina.transaction(feePayer, async () => {
+      let res = await contract.add_element_ms(ms, message, random_num);
+      let res2 = await contract.delete_element_ms(res.ms, message, res.additionRecord.index, random_num);
+    });
+
+  await tx.prove();
+  await tx.sign([feePayer.key, contractAccount.key]).send();
+
+});
+
+it('not added element should fail inclusion', async () => {
+  let ms = new MS();
+  const random_num = Field.random();
+  const timestamp = Field(0);
+  let myvar : boolean = true;
+
+  let tx = await Mina.transaction(feePayer, async () => {
+      let res = await contract.check_inclusion_ms(ms, Field(22),timestamp, random_num);
+      res.assertEquals(false);
+    });
+
+  await tx.prove();
+  await tx.sign([feePayer.key, contractAccount.key]).send();
+
+});
 
 
 });

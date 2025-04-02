@@ -1,41 +1,51 @@
 import {
-    Field,
-    UInt64,
-    Poseidon,
-    Provable,
-  } from 'o1js';
-  import { AOCL, AOCLWitness } from './AOCL'; 
-  
-  
-  describe('AOCL Tests', () => {
-    it('initialize an empty AOCL', () => {
-      const aocl = new AOCL();
-      expect(aocl.numElements).toEqual(UInt64.zero);
-    });
-  
-    it('add an element and check number of elements', () => {
-      const aocl = new AOCL();
-      const witness = aocl.add(Field(10));
-  
-      expect(aocl.numElements).toEqual(UInt64.from(1));
-    });
-  
-  
-    it('generate and verify a proof for an element', () => {
-      const aocl = new AOCL();
-      const witness = aocl.add(Field(10));
-   
-      // Verify the proof
-      const isValid = aocl.verify(witness); // values[1] corresponds to Field(20)
-      expect(isValid.toBoolean()).toBe(true);
-    });
-    
-    it('fail verification for incorrect proof', () => {
-      const aocl = new AOCL();
-      const witness = aocl.add(Field(10));
-      witness.message = Field(20);
-      const isValid = aocl.verify(witness);
-      expect(isValid.toBoolean()).toBe(false);
-    });
+  Field,
+} from 'o1js';
+import { MS, AdditionRecord } from './MS'; 
 
+
+describe('MS Tests', () => {
+  it('initialize an empty MS', () => {
+    const ms = new MS();
   });
+
+  it('add an element', () => {
+      const ms = new MS();
+      const element = Field(22);
+      const random_num = Field.random();
+      const timestamp = Field(0);
+  
+      ms.add( element, random_num);
+  });
+
+  it('add an element and probe', () => {
+      const ms = new MS();
+      const element = Field(22);
+      const random_num = Field.random();
+  
+      const record = ms.add( element, random_num);
+      const res = ms.verify_inclusion(element, record.index, random_num);
+      res.assertEquals(true);
+  });
+  
+  it('add, delete and verify', () => {
+      const ms = new MS();
+      const element = Field(22);
+      const random_num = Field.random();
+
+      const record = ms.add( element, random_num);
+      ms.drop(element, record.index, random_num);
+      const res = ms.verify_inclusion(element, record.index, random_num);
+      res.assertEquals(false);
+  });
+
+  it('verify not included element', () => {
+    const ms = new MS();
+    const element = Field(22);
+    const random_num = Field.random();
+
+    const record = ms.add( element, random_num);
+    const res = ms.verify_inclusion(element.add(1), record.index, random_num);
+    res.assertEquals(false);
+  });
+});

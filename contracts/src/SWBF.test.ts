@@ -1,8 +1,5 @@
 import {
     Field,
-    UInt64,
-    Poseidon,
-    Provable,
   } from 'o1js';
   import { SWBF, SWBFReturn } from './SWBF'; 
   

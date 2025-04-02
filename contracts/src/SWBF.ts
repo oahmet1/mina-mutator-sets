@@ -14,13 +14,12 @@ WINDOW_SIZE >> NUM_HASHES * BATCH_SIZE
 STEP_SIZE > NUM_HASHES * BATCH_SIZE / 8
 */
 
-
 // decreasing the sizes for fast testing 
-const MAX_ELEMENTS = 16; //2048; // Maximum number of elements in the filter
-const WINDOW_SIZE = 8; //1024; // Number of bits in the active window
-const NUM_HASHES = 2; //2; // Number of hash functions used
-const STEP_SIZE = 2; //4; // Step size for sliding window
-const BATCH_SIZE = 2; //8; // Number of items processed in a batch
+const MAX_ELEMENTS = 256; // Maximum number of elements in the filter ,decrease the size if you want to accelerate the operations, or increase it if you want to store more elements
+const WINDOW_SIZE = 128; // Number of bits in the active window
+const NUM_HASHES = 3; // Number of hash functions used
+const STEP_SIZE = 4; // Step size for sliding window
+const BATCH_SIZE = 8; // Number of items processed in a batch
 
 export class SWBFReturn extends Struct({
   indices: Provable.Array(Field, NUM_HASHES),
