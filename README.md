@@ -1,6 +1,6 @@
 # Mutator Sets on Mina
 
-This repo implements provable mutator sets for the [MINA](https://minaprotocol.com/) blockchain using [o1js](https://www.o1labs.org/o1js) libraries. Due to the constraints of writing provable code, such as not being able to use dynamically sized arrays or dynamic indexing on fixed size arrays, the time complexity of any operation is linear with regards to the length of the fixed sized arrays used to store the elements. Even though not as fast as it would be in other programming methodologies, provable code provides fast verification, and mutator sets are still useful for their privacy features.
+This repo implements provable [mutator sets](https://eprint.iacr.org/2023/1208.pdf) for the [MINA](https://minaprotocol.com/) blockchain using [o1js](https://www.o1labs.org/o1js) libraries. Due to the constraints of writing provable code, such as not being able to use dynamically sized arrays or dynamic indexing on fixed size arrays, the time complexity of any operation is linear with regards to the length of the fixed sized arrays used to store the elements. Even though not as fast as it would be in other programming methodologies, provable code provides fast verification, and mutator sets are still useful for their privacy features.
 ## How to use
 Example usage :
 ```ts
